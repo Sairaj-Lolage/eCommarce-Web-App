@@ -3,13 +3,18 @@ require('dotenv').config();
 const express = require('express');
 const pool = require('./db/db');
 
+const productRoutes = require('./routes/product.routes');
+
 const app = express();
+app.use(express.json());
 
 const PORT = process.env.PORT
 
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
+
+app.use('/api/products', productRoutes);
 
 app.listen(PORT, async() => {
   console.log(`Server is running....`);

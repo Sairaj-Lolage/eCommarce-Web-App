@@ -1,5 +1,4 @@
 const pool = require("../db/db");
-const { get } = require("../routes/product.routes");
 
 const getProducts = async (req, res) => {
   try {
@@ -8,7 +7,7 @@ const getProducts = async (req, res) => {
   } catch (err) {
     console.error("Error fetching products:", err.message);
     res.status(500).json({ error: "Internal Server Error" });
-  }
+  } 
 };
 
 const getProductById = async (req, res) => {

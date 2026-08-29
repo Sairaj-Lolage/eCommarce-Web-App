@@ -8,7 +8,7 @@ const {
   updateProduct,
   statusUpdateProduct,
   getProductsAdmin
-} = require("../controllers/product.controllers");
+} = require("../controllers/product.controller");
 
 // admin product routes
 route.get("/admin", getProductsAdmin);
@@ -19,7 +19,5 @@ route.patch("/:id", statusUpdateProduct);
 // cutomer product routes
 route.get("/", getProducts);
 route.get("/:id", getProductById);
-
-
 
 module.exports = route;

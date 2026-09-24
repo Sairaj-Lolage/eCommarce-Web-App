@@ -2,13 +2,14 @@ const app = require('express');
 
 const {addAddress, getAddresses, updateAddress, deleteAddress} = require('../controllers/address.controller');
 const {authenticateToken} = require('../middleware/auth.middleware');
-
+const {authorizeRoles} = require('../middleware/auth.middleware');
 const router = app.Router();
 
-router.get('/addresses', authenticateToken, getAddresses);
-router.post('/addresses', authenticateToken, addAddress);
-router.patch('/addresses/:id', authenticateToken, updateAddress);
-router.delete('/addresses/:id', authenticateToken, deleteAddress);
+router.use(authenticateToken, authorizeRoles('customer'));
+
+router.get('/addresses', getAddresses);
+router.post('/addresses', addAddress);
+router.patch('/addresses/:id', updateAddress);
+router.delete('/addresses/:id', deleteAddress);
 
 module.exports = router;
-

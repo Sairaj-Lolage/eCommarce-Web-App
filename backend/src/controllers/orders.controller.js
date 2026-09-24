@@ -1,10 +1,11 @@
 const pool = require("../db/db");
 
+// Order Controller - Customer routes
 const createOrder = async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const userId = req.user.user_id;
+    const userId = req.user.userId;
 
     const { items, address_id, payment_method = "COD" } = req.body;
 
@@ -145,28 +146,20 @@ const createOrder = async (req, res) => {
   }
 };
 
-const getOrders = async (req, res) => {
-  const userId = req.user.user_id;
+const getOrdersCustomer = async (req, res) => {
+  const userId = req.user.userId;
   const role = req.user.role;
 
   try {
     let ordersResult;
 
-    if (role === "admin") {
-      ordersResult = await pool.query(
-        `SELECT * FROM orders
-            ORDER BY created_at DESC;`,
-      );
-    }
-    else{
-      ordersResult = await pool.query(
-        `SELECT *
+    ordersResult = await pool.query(
+      `SELECT *
        FROM orders
        WHERE user_id = $1
        ORDER BY created_at DESC`,
-        [userId],
-      );
-    }
+      [userId],
+    );
 
     const orders = ordersResult.rows;
 
@@ -192,7 +185,7 @@ const getOrders = async (req, res) => {
 };
 
 const getOrderById = async (req, res) => {
-  const userId = req.user.user_id;
+  const userId = req.user.userId;
   const orderId = req.params;
 
   console.log(userId, orderId);
@@ -233,7 +226,7 @@ const getOrderById = async (req, res) => {
 };
 
 const cancelOrder = async (req, res) => {
-  const userId = req.user.user_id;
+  const userId = req.user.userId;
   const orderId = req.params;
 
   try {
@@ -298,9 +291,77 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+// Order Controller - Admin routes
+
+const getOrdersAdmin = async (req, res) => {
+  try {
+    const ordersResult = await pool.query(
+      `SELECT * FROM orders ORDER BY created_at DESC;`,
+    );
+
+    const orders = ordersResult.rows;
+
+    for (const order of orders) {
+      const itemsResult = await pool.query(
+        `SELECT oi.product_id, p.name, oi.quantity, oi.price
+         FROM order_items oi
+         JOIN products p ON oi.product_id = p.id
+         WHERE oi.order_id = $1`,
+        [order.id],
+      );
+
+      order.items = itemsResult.rows;
+    }
+
+    res.json(orders);
+  } catch (err) {
+    console.error("Error fetching all orders:", err);
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
+  }
+};
+
+const updateOrderStatus = async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  try {
+    // Check if the order exists
+    const orderResult = await pool.query(
+      `SELECT * FROM orders WHERE id = $1`,
+      [orderId],
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({
+        error: "Order not found",
+      });
+    }
+
+    // Update the order status
+    await pool.query(
+      `UPDATE orders SET status = $1 WHERE id = $2`,
+      [status, orderId],
+    );
+
+    res.json({
+      message: "Order status updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating order status:", err);
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   createOrder,
-  getOrders,
+  getOrdersCustomer,
   getOrderById,
   cancelOrder,
+
+  getOrdersAdmin,
+  updateOrderStatus
 };

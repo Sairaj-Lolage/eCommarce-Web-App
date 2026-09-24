@@ -2,12 +2,21 @@ const express = require("express");
 
 const route = express.Router();
 
-const { createOrder, getOrders, getOrderById, cancelOrder } = require("../controllers/orders.controller");
+const { createOrder, getOrdersCustomer, getOrderById, cancelOrder, getOrdersAdmin, updateOrderStatus} = require("../controllers/orders.controller");
 const { authenticateToken } = require("../middleware/auth.middleware");
+const { authorizeRoles } = require("../middleware/auth.middleware");
 
-route.post("/create", authenticateToken, createOrder);
-route.get("/get", authenticateToken, getOrders);
-route.get("/:id", authenticateToken, getOrderById);
-route.post("/:id/cancel", authenticateToken, cancelOrder);
+route.use(authenticateToken);
 
-module.exports = route;
+// customer routes
+route.post("/create", authorizeRoles("customer"),createOrder);
+route.get("/get", authorizeRoles("customer"), getOrdersCustomer);
+route.get("/:id", authorizeRoles("customer"),getOrderById);
+route.post("/:id/cancel", authorizeRoles("customer"), cancelOrder);
+
+//admin routes
+route.get("/admin/get", authorizeRoles("admin"), getOrdersAdmin);
+route.post("/:id/status", authorizeRoles("admin"), updateOrderStatus);
+
+
+module.exports = route; 

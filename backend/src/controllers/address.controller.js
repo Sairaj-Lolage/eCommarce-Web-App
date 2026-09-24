@@ -16,7 +16,7 @@ const getAddresses = async (req, res) => {
 
 const addAddress = async (req, res) => {
   try {
-    const userId = req.user.user_id; // Get the user ID from the authenticated request
+    const userId = req.user.userId; // Get the user ID from the authenticated request
     const { full_name, phone, address_line, city, state, pincode } = req.body;
     const result = await pool.query(
       `INSERT INTO addresses (user_id, full_name, phone, address_line, city, state, pincode) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
@@ -31,7 +31,7 @@ const addAddress = async (req, res) => {
 
 const updateAddress = async (req, res) => {
   try {
-    const userId = req.user.user_id; // Get the user ID from the authenticated request
+    const userId = req.user.userId; // Get the user ID from the authenticated request
     const addressId = req.params.id; // Get the address ID from the request parameters
     const { full_name, phone, address_line, city, state, pincode } = req.body;
 
@@ -74,7 +74,7 @@ const updateAddress = async (req, res) => {
 
 const deleteAddress = async (req, res) => {
   try {
-    const userId = req.user.user_id; // Get the user ID from the authenticated request
+    const userId = req.user.userId; // Get the user ID from the authenticated request
     const addressId = req.params.id; // Get the address ID from the request parameters
 
     // Check if the address belongs to the authenticated user

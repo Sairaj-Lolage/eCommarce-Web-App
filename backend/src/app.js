@@ -11,15 +11,15 @@ const orderRoutes = require('./routes/order.routes');
 const app = express();
 app.use(express.json());
 
-const PORT = process.env.PORT
-
-app.use('/api/products', productRoutes);
+const PORT = process.env.PORT 
 
 app.use('/api/auth', authRoutes);
 
+app.use('/api/products', productRoutes);
+
 app.use('/api/address', addressRoutes);
 
-app.use('/api/orders', orderRoutes);
+app.use('/api/orders', orderRoutes); 
 
 app.listen(PORT, async() => {
   console.log(`Server is running....`);

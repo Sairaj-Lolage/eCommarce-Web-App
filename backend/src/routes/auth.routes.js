@@ -10,4 +10,4 @@ route.post("/login", loginUser);
 route.get("/user", authenticateToken, userDetails);
 route.post("/logout", logoutUser)
 
-module.exports = route; 
+module.exports = route;

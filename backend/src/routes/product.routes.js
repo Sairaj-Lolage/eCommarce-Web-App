@@ -1,7 +1,7 @@
 const express = require("express");
 const route = express.Router();
 
-const { authenticateToken } = require("../middleware/auth.middleware");
+const { authenticateToken, authorizeRoles } = require("../middleware/auth.middleware");
 
 const {
   getProducts,
@@ -12,14 +12,17 @@ const {
   getProductsAdmin
 } = require("../controllers/product.controller");
 
-// admin product routes
-route.get("/admin", authenticateToken, getProductsAdmin);
-route.post("/add-product", authenticateToken, createProduct);
-route.put("/:id/update", authenticateToken, updateProduct);
-route.patch("/:id/status", authenticateToken, statusUpdateProduct);
-
 // cutomer product routes
 route.get("/", getProducts);
 route.get("/:id", getProductById);
+
+// admin product routes
+
+route.use(authenticateToken, authorizeRoles("admin"));
+
+route.get("/admin", getProductsAdmin);
+route.post("/add-product", createProduct);
+route.put("/:id/update", updateProduct);
+route.patch("/:id/status", statusUpdateProduct);
 
 module.exports = route;
